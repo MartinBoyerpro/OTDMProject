@@ -33,12 +33,13 @@ t2=clock;
 fprintf(' wall time = %6.1d s.\n', etime(t2,t1));
 %
 function [Xtr,ytr,wo,fo,tr_acc,Xte,yte,te_acc,niter,tex]=uo_nn_solve(num_target,tr_freq,tr_seed,tr_p,te_seed,te_q,la,epsG,kmax,ils,ialmax,kmaxBLS,epsal,c1,c2,isd,sg_al0,sg_be,sg_ga,sg_emax,sg_ebest,sg_seed,icg,irc,nu);
+[Xtr,ytr] =uo_nn_dataset(1234,10,[4],0.5);
+[Xte,yte] =uo_nn_dataset(1234,10,[4],0);
 sig = @(Xds) 1./(1+ exp(-Xds));
 y = @(Xds,w) sig (w'*sig(Xds));
 L = @(w,Xds,yds ) (norm(y(Xds,w )-yds)^2)/size (yds,2)+ (la*norm(w)^2)/2;
 gL = @(w,Xds,yds) (2*sig(Xds)*((y(Xds,w)-yds).*y(Xds,w).*(1-y(Xds,w))')/size(yds,2))+la*w;
-[Xtr,ytr] =uo_nn_dataset(1234,10,[4],0.5);
-[Xte,yte] =uo_nn_dataset(1234,10,[4],0);
+
 w= zeros(size(Xtr));
 %disp(w);
 sigtest=sig(Xtr);
@@ -70,7 +71,7 @@ function [xk, dk, alk, iWk,betak,Hk,tauk] = uo_solve(x1,f,g,h,epsG,kmax,almax,al
             dsave=d;
             gsave=g(x1);
             d=-g(x1);
-            [al,iWout] = uo_BLSNW32(f,g0,x0,d,ialmax,c1,c2,kmax,epsG)
+            [al,iWout] = uo_BLSNW32(f,g,x1,d,almax,c1,c2,kmax,epsG)
             almax=alsave*((gsave'*dsave)/(g(x1)'*d));
             x1 = x1 + al*d;
             k = k+1;  xk = [xk,x1]; alk = [alk,al];dk=[dk,d];iWk=[iWk,iWout];
@@ -463,5 +464,8 @@ while (1~=2),
    end
 end 
 end
+
+
+
 
 
