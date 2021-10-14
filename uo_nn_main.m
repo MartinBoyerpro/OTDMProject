@@ -11,10 +11,11 @@ te_seed    = 590100;
 %
 % Parameters for optimization
 %
+almin= 10^-3;
 la = .1;                                                     % L2 regularization.
 epsG = 10^-6; kmax = 10000;                                   % Stopping criterium.
 ils=3; ialmax = 2; kmaxBLS=30; epsal=10^-3;c1=0.01; c2=0.45;  % Linesearch.
-isd = 7; icg = 2; irc = 2 ; nu = 1.0;                         % Search direction.
+isd = 1; icg = 2; irc = 2 ; nu = 1.0;                         % Search direction.
 sg_seed = 565544; sg_al0 = 2; sg_be = 0.3; sg_ga = 0.01;      % SGM iteration.
 sg_emax = kmax; sg_ebest = floor(0.01*sg_emax);               % SGM stopping condition.
 %
@@ -39,12 +40,11 @@ gL = @(w,Xds,yds) (2*sig(Xds)*((y(Xds,w)-yds).*y(Xds,w).*(1-y(Xds,w))')/size(yds
 [Xtr,ytr] =uo_nn_dataset(1234,10,[4],0.5);
 [Xte,yte] =uo_nn_dataset(1234,10,[4],0);
 w= zeros(size(Xtr));
+%disp(w);
 sigtest=sig(Xtr);
 gltr=gL(w,Xtr,ytr);
 disp(gltr);
-
-
-
+[wk, dk, alk, iWk,betak,Hk,tauk]=uo_solve(w,L,gL,1,epsG,kmax,ialmax,0,0,c1,c2,0,isd,icg,irc,nu,0)
 
 
 end
@@ -64,10 +64,14 @@ function [xk, dk, alk, iWk,betak,Hk,tauk] = uo_solve(x1,f,g,h,epsG,kmax,almax,al
         
    %GM     
    if isd==1 
-        
+        d=-g(x1);
         while(norm(g(x1)))>epsG 
-            d=-g(x1)
-            [al,iWout] = uo_BLS(x1,d,f,g,almax,almin,rho,c1,c2,iW);
+            alsave=al;
+            dsave=d;
+            gsave=g(x1);
+            d=-g(x1);
+            [al,iWout] = uo_BLSNW32(f,g0,x0,d,ialmax,c1,c2,kmax,epsG)
+            almax=alsave*((gsave'*dsave)/(g(x1)'*d));
             x1 = x1 + al*d;
             k = k+1;  xk = [xk,x1]; alk = [alk,al];dk=[dk,d];iWk=[iWk,iWout];
             %% 
@@ -254,30 +258,7 @@ function [xk, dk, alk, iWk,betak,Hk,tauk] = uo_solve(x1,f,g,h,epsG,kmax,almax,al
 end
 
 %BLS
-function [al,iWout] = uo_BLS(x,d,f,g,almax,almin,rho,c1,c2,iW)
-    al = almax;
-    checkStrong = iW==2;  % input asks for strong
-     % update conditions
-    wc1 = f(x+al*d) <= f(x) + c1*(g(x).'*d)*al;
-    wc2 = g(x+al*d).'*d >= c2*(g(x).'*d);
-    swc2 = abs(g(x+al*d).'*d) <= c2*abs(g(x).'*d);
-    if (wc1)
-        iWout = 1;
-        if (wc2); iWout = 2; end
-        if (and(checkStrong, swc2)); iWout = 3; end
-    else
-        iWout = 0;
-    end
-    while and(al > almin, not(iWout == iW + 1))
-        [al,iWout] = uo_BLS(x,d,f,g,almax*rho,almin,rho,c1,c2,iW);
-        % update condition
-    end
 
-% iWout = 0: al does not satisfy any WC
-% iWout = 1: al satisfies (WC1)
-% iWout = 2: al satisfies WC
-% iWout = 3: al satisfies SWC
-end
 function [X,y] = uo_nn_dataset(seed, ncol, target, freq)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Input:
@@ -348,6 +329,139 @@ for j=1:ncol
         end
     end
 end
+end
+
+
+function [alphas,iout] = uo_BLSNW32(f,g0,x0,d,alpham,c1,c2,maxiter,eps)
+% function alphas = strongwolfe(f,d,x0,alpham)
+% Line search algorithm satisfying strong Wolfe conditions
+% Algorithms 3.5 on pages 60-61 in Nocedal and Wright
+% MATLAB code by Kartik Sivaramakrishnan
+% Last modified: January 27, 2008
+%
+% F.-Javier Heredia, September 2018 <fjh...>
+% g,c1,c2,maxiter, eps
+% iout = 1 : too many iterations
+% iout = 2 : stacked, alpha_[i]=alpha^[i-1]
+
+alpha0 = 0;
+alphap = alpha0;
+g = @(x) g0(x)';
+%<fjh
+iout = 0;
+if c1 == 0
+    c1 = 1e-4;
+end
+if c2==0
+    c2 = 0.5;
+end
+%alphax = alpham*rand(1);
+alphax = alpham;
+%[fx0,gx0] = feval(f,x0,d);
+fx0 = f(x0);
+gx0 = g(x0)*d;
+%>
+fxp = fx0;
+gxp = gx0;
+i=1;
+% alphap is alpha_{i-1}
+% alphax is alpha_i
+while (1 ~= 2 && i < maxiter)
+  %<fjh
+    if abs(alphap-alphax) < eps
+      iout = 2;
+      alphas = alphax;
+      return
+    end
+  %>
+    xx = x0 + alphax*d;
+  %<fjh
+  %[fxx,gxx] = feval(f,xx,d);
+    fxx = f(xx);
+    gxx = g(xx)*d;
+  %>
+    if (fxx > fx0 + c1*alphax*gx0) || ((i > 1) && (fxx >= fxp)),
+    [alphas,iout_zoom] = zoom(f,g,x0,d,alphap,alphax,c1,c2,eps);
+    %<fjh
+    if iout_zoom == 2
+        iout = 2;
+    end
+    %>
+    return;
+  end
+  if abs(gxx) <= -c2*gx0,
+    alphas = alphax;
+    return;
+  end
+  if gxx >= 0,
+    [alphas,iout_zoom] = zoom(f,g,x0,d,alphax,alphap,c1,c2,eps);
+    %<fjh
+    if iout_zoom == 2
+        iout = 2;
+    end
+    %>
+    return;
+  end
+  alphap = alphax;
+  fxp = fxx;
+  gxp = gxx;
+  alphax = alphax + (alpham-alphax)*rand(1);
+  i = i+1;
+end
+if i==maxiter
+    iout = 1;
+    alphas = alphax;
+end
+end
+
+
+function [alphas,iout] = zoom(f,g,x0,d,alphal,alphah,c1,c2,eps)
+% function alphas = zoom(f,g,x0,d,alphal,alphah)
+% Algorithm 3.6 on page 61 in Nocedal and Wright
+% MATLAB code by Kartik Sivaramakrishnan
+% Last modified: January 27, 2008
+% F.-Javier Heredia, September 2018 <fjh...>
+
+%<fjh
+%[fx0,gx0] = feval(f,x0,d);
+fx0 = f(x0);
+gx0 = g(x0)*d;
+iout = 0;
+%>
+while (1~=2),
+    %<fjh
+    if abs(alphal-alphah) < eps
+      iout = 2;
+      alphas = alphax;
+      return
+    end
+    %>
+
+   alphax = 1/2*(alphal+alphah);
+   xx = x0 + alphax*d;
+   %<fjh
+   %[fxx,gxx] = feval(f,xx,d);
+   fxx = f(xx);
+   gxx = g(xx)*d;
+   %>
+   xl = x0 + alphal*d;
+   %<fjh
+   %fxl = feval(f,xl,d);
+   fxl = f(xl);
+   %>
+   if ((fxx > fx0 + c1*alphax*gx0) || (fxx >= fxl)),
+      alphah = alphax;
+   else
+      if abs(gxx) <= -c2*gx0,
+        alphas = alphax;
+        return;
+      end
+      if gxx*(alphah-alphal) >= 0,
+        alphah = alphal;
+      end
+      alphal = alphax;
+   end
+end 
 end
 
 
