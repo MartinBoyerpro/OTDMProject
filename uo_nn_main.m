@@ -32,17 +32,25 @@ t2=clock;
 fprintf(' wall time = %6.1d s.\n', etime(t2,t1));
 %
 function [Xtr,ytr,wo,fo,tr_acc,Xte,yte,te_acc,niter,tex]=uo_nn_solve(num_target,tr_freq,tr_seed,tr_p,te_seed,te_q,la,epsG,kmax,ils,ialmax,kmaxBLS,epsal,c1,c2,isd,sg_al0,sg_be,sg_ga,sg_emax,sg_ebest,sg_seed,icg,irc,nu);
-
-
-[Xtr,ytr] =uo_nn_datasett(1234,10,[4],0.5);
-[Xte,yte] =uo_nn_datasett(1234,10,[4],0);
-
+sig = @(Xds) 1./(1+ exp(-Xds));
+y = @(Xds,w) sig (w'*sig(Xds));
+L = @(w,Xds,yds ) (norm(y(Xds,w )-yds)^2)/size (yds,2)+ (la*norm(w)^2)/2;
+gL = @(w,Xds,yds) (2*sig(Xds)*((y(Xds,w)-yds).*y(Xds,w).*(1-y(Xds,w))')/size(yds,2))+la*w;
+[Xtr,ytr] =uo_nn_dataset(1234,10,[4],0.5);
+[Xte,yte] =uo_nn_dataset(1234,10,[4],0);
+w= zeros(size(Xtr));
+sigtest=sig(Xtr);
+gltr=gL(w,Xtr,ytr);
+disp(gltr);
 
 
 
 
 
 end
+
+
+
 function [xk, dk, alk, iWk,betak,Hk,tauk] = uo_solve(x1,f,g,h,epsG,kmax,almax,almin,rho,c1,c2,iW,isd,icg,irc,nu,delta)
         k=1;
         tauk=1;
@@ -270,4 +278,76 @@ function [al,iWout] = uo_BLS(x,d,f,g,almax,almin,rho,c1,c2,iW)
 % iWout = 2: al satisfies WC
 % iWout = 3: al satisfies SWC
 end
+function [X,y] = uo_nn_dataset(seed, ncol, target, freq)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Input:
+% target: if <>[] : target numbers.
+%         if = [] : the function is asked to randomly generate 'ncol'
+%         digits.
+% freq : 
+% Output:
+% y     : if <>[] : y(i)=1 if X(:,i) is one of the target digits in 'target'; y(i)=0 otherwise.
+%         if = [] : y(i) integer stored in X(:,i).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+N = [
+    0 0 1 0 0, 0 1 1 0 0, 0 0 1 0 0, 0 0 1 0 0, 0 0 1 0 0, 0 0 1 0 0, 0 1 1 1 0; % 1
+    0 1 1 1 0, 1 0 0 0 1, 0 0 0 0 1, 0 0 0 1 0, 0 0 1 0 0, 0 1 0 0 0, 1 1 1 1 1; % 2
+    0 1 1 1 0, 1 0 0 0 1, 0 0 0 0 1, 0 0 1 1 0, 0 0 0 0 1, 1 0 0 0 1, 0 1 1 1 0; % 3
+    0 0 1 1 0, 0 1 0 1 0, 1 0 0 1 0, 1 0 0 1 0, 1 1 1 1 1, 0 0 0 1 0, 0 0 0 1 0; % 4
+    1 1 1 1 1, 1 0 0 0 0, 1 1 1 1 0, 0 0 0 0 1, 0 0 0 0 1, 1 0 0 0 1, 0 1 1 1 0; % 5
+    0 0 1 1 1, 0 1 0 0 0, 1 0 0 0 0, 1 1 1 1 0, 1 0 0 0 1, 1 0 0 0 1, 0 1 1 1 0; % 6
+    1 1 1 1 1, 0 0 0 0 1, 0 0 0 0 1, 0 0 0 1 0, 0 0 1 0 0, 0 1 0 0 0, 1 0 0 0 0; % 7
+    0 1 1 1 0, 1 0 0 0 1, 1 0 0 0 1, 0 1 1 1 0, 1 0 0 0 1, 1 0 0 0 1, 0 1 1 1 0; % 8
+    0 1 1 1 0, 1 0 0 0 1, 1 0 0 0 1, 0 1 1 1 1, 0 0 0 0 1, 0 0 0 0 1, 0 1 1 1 0; % 9
+    0 1 1 1 0, 1 0 0 0 1, 1 0 0 0 1, 1 0 0 0 1, 1 0 0 0 1, 1 0 0 0 1, 0 1 1 1 0; % 0
+    ];
+N = N';
+%%
+xval     = 10;
+maxsigma = 1.;
+minsigma = 0.25;
+if xval > 0
+    N = xval*((N-1)+N);
+end
+if ~isempty(seed) rng(seed); end;
+nT = size(target,2);
+nPixels = size(N,1);
+%% Generation
+for j=1:ncol
+    if nT  > 0 & rand() < (freq-0.1*nT)/(1-0.1*nT)
+        i = target(randi([1,nT]));
+    else
+        i = randi(10);
+    end
+    X(:,j) = N(:,i);
+    if isempty(target)
+        y(j) = i;
+    else
+        
+        if any(i == target)
+            y(j) = 1;
+        else
+            y(j) = 0;
+        end
+    end
+end
+%% Blur
+for j=1:ncol
+    l = zeros(1,nPixels);
+    sigma = minsigma + (maxsigma-minsigma)*rand();
+    for k = 1:nPixels
+        ii = randi([1 nPixels]);
+        while l(ii)==1
+            ii = randi([1 nPixels]);
+        end
+        l(ii) = 1;
+        if X(ii,j) > 0
+            X(ii,j) =  xval + sigma*xval*randn();
+        else
+            X(ii,j) = -(xval + sigma*xval*randn());
+        end
+    end
+end
+end
+
 
