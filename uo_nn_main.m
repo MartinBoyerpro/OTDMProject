@@ -49,7 +49,7 @@ L2=@(w) L(w,Xtr,ytr);
 gL2=@(w) gL(w,Xtr,ytr);
 
 
-w= zeros(size(Xtr));
+w= ones(size(Xtr));
 %disp(w);
 sigtest=sig(Xtr);
 gltr=gL(w,Xtr,ytr);
@@ -62,7 +62,7 @@ end
 
 
 
-function [xk, dk, alk, iWk,betak,Hk,tauk] = uo_solve(x1,f,g,h,epsG,kmax,almax,almin,rho,c1,c2,iW,isd,icg,irc,nu,delta,Xtr,ytr)
+function [xk, dk, alk, iWk,betak,Hk,tauk] = uo_solve(x1,f,gL2,h,epsG,kmax,almax,almin,rho,c1,c2,iW,isd,icg,irc,nu,delta,Xtr,ytr)
         %L2=@(w) L(w,Xtr,ytr);
         %gL2=@(w) gL(w,Xtr,ytr);
         k=1;
@@ -77,13 +77,14 @@ function [xk, dk, alk, iWk,betak,Hk,tauk] = uo_solve(x1,f,g,h,epsG,kmax,almax,al
         
    %GM     
    if isd==1 
-        d=-g(x1);
-        while(norm(g(x1)))>epsG 
+        d=-gL2(x1);
+        disp(gL2(x1));
+        while(norm(gL2(x1)))>epsG 
             alsave=al;
             dsave=d;
-            gsave=g(x1);
-            d=-g(x1);
-            [al,iWout] = uo_BLSNW32(f,g,x1,d,almax,c1,c2,kmax,epsG);
+            gsave=gL2(x1);
+            d=-gL2(x1);
+            [al,iWout] = uo_BLSNW32(f,gL2,x1,d,almax,c1,c2,kmax,epsG);
             almax=alsave*((gsave'*dsave)/(g(x1)'*d));
             disp("ayo");
             x1 = x1 + al*d;
@@ -393,6 +394,8 @@ while (1 ~= 2 && i < maxiter)
     fxx = f(xx);
     gxx = g(xx)*d;
   %>
+    %disp(fx0+c1*alphax*gx0)
+    disp(alphax)
     if (fxx > fx0 + c1*alphax*gx0) || ((i > 1) && (fxx >= fxp)),
     [alphas,iout_zoom] = zoom(f,g,x0,d,alphap,alphax,c1,c2,eps);
     %<fjh
@@ -473,7 +476,6 @@ while (1~=2),
       end
       alphal = alphax;
    end
-end
 end
 end
 
