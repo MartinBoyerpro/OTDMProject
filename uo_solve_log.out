@@ -1,0 +1,110 @@
+   [uo_solve_log]
+   f= @(x)x(1)^2+x(2)^3+3*x(1)*x(2)
+   epsG= 1.0e-06, kmax= 1500
+   almax=  2, almin= 1.0e-03, rho= 0.50, c1= 0.01, c2= 0.45, iW= 1
+   isd= 3
+   x1 = [ -3.0e+00 , -1.0e+00 ]
+      k     g'*d       al iW    la(1)    kappa    ||g||        f        r        M
+      1 -1.2e+02 +2.5e-01  2 +1.0e+00 +1.0e+00 +1.1e+01 +1.7e+01 +6.7e-02 +3.6e-03
+      2 -2.0e+00 +5.0e-01  2 +2.7e-01 +3.9e+00 +1.5e+00 -4.4e-01 +6.7e-01 +5.4e-01
+      3 -5.1e-01 +2.0e+00  2 +1.1e-01 +7.5e+00 +2.0e+00 -8.5e-01 +2.6e-01 +3.1e-01
+      4 -6.4e-01 +1.0e+00  2 +1.2e-01 +1.5e+01 +6.8e-01 -1.5e+00 +5.1e-01 +2.4e+00
+      5 -2.8e-01 +1.0e+00  2 +1.1e-01 +1.1e+01 +1.1e+00 -1.6e+00 +4.5e-02 +4.1e-01
+      6 -8.6e-03 +2.0e+00  2 +9.7e-02 +1.1e+01 +2.2e-01 -1.7e+00 +5.8e-01 +1.2e+02
+      7 -6.0e-03 +1.0e+00  2 +1.0e-01 +1.1e+01 +1.8e-01 -1.7e+00 +9.9e-04 +3.4e-01
+      8 -5.6e-06 +2.0e+00  2 +1.0e-01 +1.1e+01 +5.2e-03 -1.7e+00 +9.1e-01 +3.2e+05
+      9 -5.2e-06 +1.0e+00  2 +1.0e-01 +1.1e+01 +4.9e-03 -1.7e+00 +5.8e-07 +2.2e-01
+     10 -3.0e-12 +1.0e+00  2 +1.0e-01 +1.1e+01 +3.1e-06 -1.7e+00 +0.0e+00 +0.0e+00
+     11                                        +4.0e-08 -1.7e+00
+      k     g'*d       al iW    la(1)    kappa    ||g||        f        r        M
+   x* = [ -2.3e+00 , +1.5e+00 ]
+   [uo_solve_log]
+{'uo_solve_plot' is not found in the current folder or on the MATLAB path, but exists in:
+    C:\Users\33651\Desktop\UPC\OTDM\computational_exo
+
+<a href = "matlab:matlab.internal.language.commandline.executeCode('cd ''C:\Users\33651\Desktop\UPC\OTDM\computational_exo''')">Change the MATLAB current folder</a> or <a href = "matlab:matlab.internal.language.commandline.executeCode('addpath ''C:\Users\33651\Desktop\UPC\OTDM\computational_exo''')">add its folder to the MATLAB path</a>.
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('CE2_2bis>uo_solve_log', 'C:\Users\33651\Desktop\UPC\OTDM\OTDMProject\CE2_2bis.m', 321)" style="font-weight:bold">CE2_2bis>uo_solve_log</a> (<a href="matlab: opentoline('C:\Users\33651\Desktop\UPC\OTDM\OTDMProject\CE2_2bis.m',321,0)">line 321</a>)
+    subplot(2,2,1); uo_solve_plot(f, xk, gk, xylim, 1, fs); subplot(2,2,2); uo_solve_plot(f, xk, gk, xylim, 2,fs);
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('CE2_2bis', 'C:\Users\33651\Desktop\UPC\OTDM\OTDMProject\CE2_2bis.m', 14)" style="font-weight:bold">CE2_2bis</a> (<a href="matlab: opentoline('C:\Users\33651\Desktop\UPC\OTDM\OTDMProject\CE2_2bis.m',14,0)">line 14</a>)
+[la1k,kappak,rk,Mk] = uo_solve_log(x1,f,g,h,epsG,kmax,almax,almin,rho,c1,c2,iW,isd,icg,irc,nu,delta,xk,dk,alk,iWk,betak,Hk, tauk,xo,xylim,logfreq);
+} 
+CE2_2bis
+[uo_FDM_CE21]
+
+iWk =
+
+     []
+
+   [uo_solve_log]
+   f= @(x)x(1)^2+x(2)^3+3*x(1)*x(2)
+   epsG= 1.0e-06, kmax= 1500
+   almax=  2, almin= 1.0e-03, rho= 0.50, c1= 0.01, c2= 0.45, iW= 1
+   isd= 3
+   x1 = [ -3.0e+00 , -1.0e+00 ]
+      k     g'*d       al iW    la(1)    kappa    ||g||        f        r        M
+      1 -1.2e+02 +2.5e-01  2 +1.0e+00 +1.0e+00 +1.1e+01 +1.7e+01 +6.7e-02 +3.6e-03
+      2 -2.0e+00 +5.0e-01  2 +2.7e-01 +3.9e+00 +1.5e+00 -4.4e-01 +6.7e-01 +5.4e-01
+      3 -5.1e-01 +2.0e+00  2 +1.1e-01 +7.5e+00 +2.0e+00 -8.5e-01 +2.6e-01 +3.1e-01
+      4 -6.4e-01 +1.0e+00  2 +1.2e-01 +1.5e+01 +6.8e-01 -1.5e+00 +5.1e-01 +2.4e+00
+      5 -2.8e-01 +1.0e+00  2 +1.1e-01 +1.1e+01 +1.1e+00 -1.6e+00 +4.5e-02 +4.1e-01
+      6 -8.6e-03 +2.0e+00  2 +9.7e-02 +1.1e+01 +2.2e-01 -1.7e+00 +5.8e-01 +1.2e+02
+      7 -6.0e-03 +1.0e+00  2 +1.0e-01 +1.1e+01 +1.8e-01 -1.7e+00 +9.9e-04 +3.4e-01
+      8 -5.6e-06 +2.0e+00  2 +1.0e-01 +1.1e+01 +5.2e-03 -1.7e+00 +9.1e-01 +3.2e+05
+      9 -5.2e-06 +1.0e+00  2 +1.0e-01 +1.1e+01 +4.9e-03 -1.7e+00 +5.8e-07 +2.2e-01
+     10 -3.0e-12 +1.0e+00  2 +1.0e-01 +1.1e+01 +3.1e-06 -1.7e+00 +0.0e+00 +0.0e+00
+     11                                        +4.0e-08 -1.7e+00
+      k     g'*d       al iW    la(1)    kappa    ||g||        f        r        M
+   x* = [ -2.3e+00 , +1.5e+00 ]
+   [uo_solve_log]
+{'uo_solve_plot' is not found in the current folder or on the MATLAB path, but exists in:
+    C:\Users\33651\Desktop\UPC\OTDM\computational_exo
+
+<a href = "matlab:matlab.internal.language.commandline.executeCode('cd ''C:\Users\33651\Desktop\UPC\OTDM\computational_exo''')">Change the MATLAB current folder</a> or <a href = "matlab:matlab.internal.language.commandline.executeCode('addpath ''C:\Users\33651\Desktop\UPC\OTDM\computational_exo''')">add its folder to the MATLAB path</a>.
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('CE2_2bis>uo_solve_log', 'C:\Users\33651\Desktop\UPC\OTDM\OTDMProject\CE2_2bis.m', 321)" style="font-weight:bold">CE2_2bis>uo_solve_log</a> (<a href="matlab: opentoline('C:\Users\33651\Desktop\UPC\OTDM\OTDMProject\CE2_2bis.m',321,0)">line 321</a>)
+    subplot(2,2,1); uo_solve_plot(f, xk, gk, xylim, 1, fs); subplot(2,2,2); uo_solve_plot(f, xk, gk, xylim, 2,fs);
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('CE2_2bis', 'C:\Users\33651\Desktop\UPC\OTDM\OTDMProject\CE2_2bis.m', 14)" style="font-weight:bold">CE2_2bis</a> (<a href="matlab: opentoline('C:\Users\33651\Desktop\UPC\OTDM\OTDMProject\CE2_2bis.m',14,0)">line 14</a>)
+[la1k,kappak,rk,Mk] = uo_solve_log(x1,f,g,h,epsG,kmax,almax,almin,rho,c1,c2,iW,isd,icg,irc,nu,delta,xk,dk,alk,iWk,betak,Hk, tauk,xo,xylim,logfreq);
+} 
+CE2_2bis
+[uo_FDM_CE21]
+
+iWk =
+
+     []
+
+   [uo_solve_log]
+   f= @(x)x(1)^2+x(2)^3+3*x(1)*x(2)
+   epsG= 1.0e-06, kmax= 1500
+   almax=  2, almin= 1.0e-03, rho= 0.50, c1= 0.01, c2= 0.45, iW= 1
+   isd= 3
+   x1 = [ -3.0e+00 , -1.0e+00 ]
+      k     g'*d       al iW    la(1)    kappa    ||g||        f        r        M
+      1 -1.2e+02 +2.5e-01  2 +1.0e+00 +1.0e+00 +1.1e+01 +1.7e+01 +6.7e-02 +3.6e-03
+      2 -2.0e+00 +5.0e-01  2 +2.7e-01 +3.9e+00 +1.5e+00 -4.4e-01 +6.7e-01 +5.4e-01
+      3 -5.1e-01 +2.0e+00  2 +1.1e-01 +7.5e+00 +2.0e+00 -8.5e-01 +2.6e-01 +3.1e-01
+      4 -6.4e-01 +1.0e+00  2 +1.2e-01 +1.5e+01 +6.8e-01 -1.5e+00 +5.1e-01 +2.4e+00
+      5 -2.8e-01 +1.0e+00  2 +1.1e-01 +1.1e+01 +1.1e+00 -1.6e+00 +4.5e-02 +4.1e-01
+      6 -8.6e-03 +2.0e+00  2 +9.7e-02 +1.1e+01 +2.2e-01 -1.7e+00 +5.8e-01 +1.2e+02
+      7 -6.0e-03 +1.0e+00  2 +1.0e-01 +1.1e+01 +1.8e-01 -1.7e+00 +9.9e-04 +3.4e-01
+      8 -5.6e-06 +2.0e+00  2 +1.0e-01 +1.1e+01 +5.2e-03 -1.7e+00 +9.1e-01 +3.2e+05
+      9 -5.2e-06 +1.0e+00  2 +1.0e-01 +1.1e+01 +4.9e-03 -1.7e+00 +5.8e-07 +2.2e-01
+     10 -3.0e-12 +1.0e+00  2 +1.0e-01 +1.1e+01 +3.1e-06 -1.7e+00 +0.0e+00 +0.0e+00
+     11                                        +4.0e-08 -1.7e+00
+      k     g'*d       al iW    la(1)    kappa    ||g||        f        r        M
+   x* = [ -2.3e+00 , +1.5e+00 ]
+   [uo_solve_log]
+{'uo_solve_plot' is not found in the current folder or on the MATLAB path, but exists in:
+    C:\Users\33651\Desktop\UPC\OTDM\computational_exo
+
+<a href = "matlab:matlab.internal.language.commandline.executeCode('cd ''C:\Users\33651\Desktop\UPC\OTDM\computational_exo''')">Change the MATLAB current folder</a> or <a href = "matlab:matlab.internal.language.commandline.executeCode('addpath ''C:\Users\33651\Desktop\UPC\OTDM\computational_exo''')">add its folder to the MATLAB path</a>.
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('CE2_2bis>uo_solve_log', 'C:\Users\33651\Desktop\UPC\OTDM\OTDMProject\CE2_2bis.m', 322)" style="font-weight:bold">CE2_2bis>uo_solve_log</a> (<a href="matlab: opentoline('C:\Users\33651\Desktop\UPC\OTDM\OTDMProject\CE2_2bis.m',322,0)">line 322</a>)
+    subplot(2,2,1); uo_solve_plot(f, xk, gk, xylim, 1, fs); subplot(2,2,2); uo_solve_plot(f, xk, gk, xylim, 2,fs);
+
+Error in <a href="matlab:matlab.internal.language.introspective.errorDocCallback('CE2_2bis', 'C:\Users\33651\Desktop\UPC\OTDM\OTDMProject\CE2_2bis.m', 14)" style="font-weight:bold">CE2_2bis</a> (<a href="matlab: opentoline('C:\Users\33651\Desktop\UPC\OTDM\OTDMProject\CE2_2bis.m',14,0)">line 14</a>)
+[la1k,kappak,rk,Mk] = uo_solve_log(x1,f,g,h,epsG,kmax,almax,almin,rho,c1,c2,iW,isd,icg,irc,nu,delta,xk,dk,alk,iWk,betak,Hk, tauk,xo,xylim,logfreq);
+} 

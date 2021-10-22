@@ -21,11 +21,15 @@ sg_emax = kmax; sg_ebest = floor(0.01*sg_emax);               % SGM stopping con
 %
 % Optimization
 %
-%sig = @(Xds) 1./(1+ exp(-Xds));
-%y = @(Xds,w) sig (w'*sig(Xds));
-%L = @(w,Xds,yds ) (norm(y(Xds,w )-yds)^2)/size (yds,2)+ (la*norm(w)^2)/2;
-%gL = @(w,Xds,yds) (2*sig(Xds)*(( y( Xds,w)-yds).*y(Xds,w).*(1-y(Xds,w))')/size(yds,2))+la*w;
 
+%[Xtr,ytr] =uo_nn_dataset(1234,10,[4],0.5);
+%[Xte,yte] =uo_nn_dataset(1234,10,[4],0);
+sig = @(Xds) 1./(1+ exp(-Xds));
+y = @(Xds,w) sig (w'*sig(Xds));
+L = @(w,Xds,yds ) (norm(y(Xds,w )-yds)^2)/size (yds,2)+ (la*norm(w)^2)/2;
+gL = @(w,Xds,yds) (2*sig(Xds)*(( y( Xds,w)-yds).*y(Xds,w).*(1-y(Xds,w))')/size(yds,2))+la*w;
+%L2=@(w) L(w,Xtr,ytr);
+%gL2=@(w) gL(w,Xtr,ytr);
 
 t1=clock;
 [Xtr,ytr,wo,fo,tr_acc,Xte,yte,te_acc,niter,tex]=uo_nn_solve(num_target,tr_freq,tr_seed,tr_p,te_seed,te_q,la,epsG,kmax,ils,ialmax,kmaxBLS,epsal,c1,c2,isd,sg_al0,sg_be,sg_ga,sg_emax,sg_ebest,sg_seed,icg,irc,nu);
@@ -41,23 +45,26 @@ y = @(Xds,w) sig (w'*sig(Xds));
 L = @(w,Xds,yds ) (norm(y(Xds,w )-yds)^2)/size (yds,2)+ (la*norm(w)^2)/2;
 gL = @(w,Xds,yds) (2*sig(Xds)*((y(Xds,w)-yds).*y(Xds,w).*(1-y(Xds,w))')/size(yds,2))+la*w;
 
+L2=@(w) L(w,Xtr,ytr);
+gL2=@(w) gL(w,Xtr,ytr);
 
-w= zeros(size(Xtr));
+disp(size(Xtr))
+w= zeros(35,1);
 %disp(w);
 sigtest=sig(Xtr);
 gltr=gL(w,Xtr,ytr);
 %disp(gltr);
 disp("Before UOsolve")
-[wk, dk, alk, iWk,betak,Hk,tauk]=uo_solve(w,L,gL,1,epsG,kmax,ialmax,0,0,c1,c2,0,isd,icg,irc,nu,0,Xtr,ytr)
+[wk, dk, alk, iWk,betak,Hk,tauk]=uo_solve(w,L2,gL2,1,epsG,kmax,ialmax,0,0,c1,c2,0,isd,icg,irc,nu)
 
 
 end
 
 
 
-function [xk, dk, alk, iWk,betak,Hk,tauk] = uo_solve(x1,f,g,h,epsG,kmax,almax,almin,rho,c1,c2,iW,isd,icg,irc,nu,delta,Xtr,ytr)
-        L2=@(w) L(w,Xtr,ytr);
-        gL2=@(w) gL(w,Xtr,ytr);
+function [xk, dk, alk, iWk,betak,Hk,tauk] = uo_solve(x1,f,g,h,epsG,kmax,almax,almin,rho,c1,c2,iW,isd,icg,irc,nu)
+        %L2=@(w) L(w,Xtr,ytr);
+        %gL2=@(w) gL(w,Xtr,ytr);
         k=1;
         tauk=1;
         xk = [x1];
@@ -70,14 +77,14 @@ function [xk, dk, alk, iWk,betak,Hk,tauk] = uo_solve(x1,f,g,h,epsG,kmax,almax,al
         
    %GM     
    if isd==1 
-        d=-g(x1,Xtr,ytr);
-        while(norm(g(x1,Xtr,ytr)))>epsG 
+        d=-g(x1);
+        while(norm(g(x1)))>epsG 
             alsave=al;
             dsave=d;
-            gsave=g(x1,Xtr,ytr);
-            d=-g(x1,Xtr,ytr);
-            [al,iWout] = uo_BLSNW32(L2,gL2,x1,d,almax,c1,c2,kmax,epsG);
-            almax=alsave*((gsave'*dsave)/(g(x1,Xtr,ytr)'*d));
+            gsave=g(x1);
+            d=-g(x1);
+            [al,iWout] = uo_BLSNW32(f,g,x1,d,almax,c1,c2,kmax,epsG);
+            almax=alsave*((gsave'*dsave)/(g(x1)'*d));
             disp("ayo");
             x1 = x1 + al*d;
             k = k+1;  xk = [xk,x1]; alk = [alk,al];dk=[dk,d];iWk=[iWk,iWout];
@@ -418,7 +425,6 @@ if i==maxiter
     iout = 1;
     alphas = alphax;
 end
-end
 
 function [alphas,iout] = zoom(f,g,x0,d,alphal,alphah,c1,c2,eps)
 % function alphas = zoom(f,g,x0,d,alphal,alphah)
@@ -466,9 +472,6 @@ while (1~=2),
       end
       alphal = alphax;
    end
+end 
 end
 end
-
-
-
-
