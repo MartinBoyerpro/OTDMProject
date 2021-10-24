@@ -26,6 +26,7 @@ alphax = alpham;
 %[fx0,gx0] = feval(f,x0,d);
 fx0 = f(x0);
 gx0 = g(x0)*d;
+%disp(size(gx0));
 %>
 fxp = fx0;
 gxp = gx0;
@@ -40,6 +41,8 @@ while (1 ~= 2 && i < maxiter)
       return
     end
   %>
+%     disp(size(x0));
+%     disp(size(d));
     xx = x0 + alphax*d;
   %<fjh
   %[fxx,gxx] = feval(f,xx,d);
