@@ -1,4 +1,4 @@
-function[wstar,niter] = SGM (wo,la,L,Le,gL,Xtr,ytr,Xte,yte,sg_al0,sg_be,sg_ga,sg_emax,sg_ebest);
+function[wstar,niter,fo] = SGM (wo,la,L,Le,gL,Xtr,ytr,Xte,yte,sg_al0,sg_be,sg_ga,sg_emax,sg_ebest);
 p = size(Xtr,2);
 m = sg_ga*p;
 sg_Ke = p/m;
@@ -47,8 +47,7 @@ while e <= sg_emax && s< sg_ebest
     else
         s=s+1;
     end
-    
+    fo=L(wo);
 end
     niter=count;
 end
-   
