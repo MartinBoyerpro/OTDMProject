@@ -1,4 +1,4 @@
-   clear;
+  clear;
 %
 % Parameters.
 %
@@ -32,12 +32,11 @@ t2=clock;
 total_t = etime(t2,t1);
 fprintf(' wall time = %6.1d s.\n', total_t);
 fclose(fileID);
-%uo_nn_batch_BP_log(tr_seed,te_seed,sg_seed, total_t, csvfile);
+uo_nn_batch_BP_log(tr_seed,te_seed,sg_seed, total_t, csvfile);
 
 function [Xtr,ytr,wo,fo,tr_acc,Xte,yte,te_acc,niter,tex]=uo_nn_solve(num_target,tr_freq,tr_seed,tr_p,te_seed,te_q,la,epsG,kmax,ils,ialmax,kmaxBLS,epsal,c1,c2,isd,sg_al0,sg_be,sg_ga,sg_emax,sg_ebest,sg_seed,icg,irc,nu)
+tsolve1=clock;
 %create the training data set
-fo=0;
-tex=0;
 [Xtr,ytr] = uo_nn_dataset(tr_seed , tr_p , num_target , tr_freq);
 
 %create the evaluater data set
@@ -45,7 +44,6 @@ tex=0;
 %Loss function and it gradient
 sig = @(Xds) 1./(1+ exp(-Xds));
 y = @(Xds,w) sig (w'*sig(Xds));
-acc = @(Xds,yds,wo) 100*sum(yds==round(y(Xds,wo)))/size(Xds,2);
 
 % L = @(w,Xds,yds ) (norm(y(Xds,w)-yds)^2)/size (yds,2)+ (la*norm(w)^2)/2;
 % gL = @(w,Xds,yds) (2*sig(Xds)*((y(Xds,w)-yds).*y(Xds,w).*(1-y(Xds,w))')/size(yds,2))+la*w;
@@ -53,21 +51,42 @@ acc = @(Xds,yds,wo) 100*sum(yds==round(y(Xds,wo)))/size(Xds,2);
 L  = @(w) (norm(y(Xtr,w)-ytr)^2)/size (ytr,2) + (la*norm(w)^2)/2;                      % Loss function.
 gL = @(w) (2*sig(Xtr)*((y(Xtr,w)-ytr).*y(Xtr,w).*(1-y(Xtr,w)))')/size(ytr,2)+la*w;    % Gradient.
 Le =  @(w) (norm(y(Xte,w)-yte)^2)/size (yte,2) + (la*norm(w)^2)/2; 
+acc = @(Xds,yds,wo) 100*sum(yds==round(y(Xds,wo)))/size(Xds,2);
 %initialization of weights
 wo=ones(1,35)'*0;
 %Gradient method
 if isd == 1
    [wo,niter] = GM(epsG,kmax,ialmax,L,gL,wo,c1,c2,kmaxBLS,epsal);
-   
+   fo = L(wo);
+   tr_acc = acc(Xtr,ytr,wo);
+   te_acc = acc(Xte,yte,wo);
+%    uo_nn_Xyplot(Xtr,ytr,wo);
 %BFGS-quasi Newton Method
 elseif isd == 3
        [wo,niter] =  BFGS (epsG,kmax,ialmax,L,gL,wo,c1,c2,kmaxBLS,epsal);
-       
+       fo = L(wo);
+       tr_acc = acc(Xtr,ytr,wo);
+       te_acc = acc(Xte,yte,wo);
+%        disp("niter = "+niter);
+%        uo_nn_Xyplot(Xtr,ytr,wo);
        
 elseif isd == 7
-    [wo,niter] =  SGM (wo,la,L,Le,gL,Xtr,ytr,Xte,yte,sg_al0,sg_be,sg_ga,sg_emax,sg_ebest);
+    [wo] =  SGM (wo,la,L,Le,gL,Xtr,ytr,Xte,yte,sg_al0,sg_be,sg_ga,sg_emax,sg_ebest);
+    fo = L(wo);
+    tr_acc = acc(Xtr,ytr,wo);
+    te_acc = acc(Xte,yte,wo);
+    
+    niter = 2021;
+%        disp("training");
+%        uo_nn_Xyplot(Xtr,ytr,wo);
+%        disp("Testing");
+%        uo_nn_Xyplot(Xte,yte,wo);
 end
 
-tr_acc=acc(Xtr,ytr,wo);
-te_acc=acc(Xte,yte,wo);
+tsolve2=clock;
+tex = etime(tsolve2,tsolve1);
+
+
+
+
 end
