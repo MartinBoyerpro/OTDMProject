@@ -1,4 +1,4 @@
-function[wo,niter] = GM (epsG,kmax,ialmax,L,gL,wo,c1,c2,kmaxBLS,epsal)
+function[wo,niter,fo] = GM (epsG,kmax,ialmax,L,gL,wo,c1,c2,kmaxBLS,epsal)
 %initialization of the iteration's number
 k=1;
 % Vector of solution points.
@@ -20,15 +20,17 @@ while(norm(gL(wo)))>epsG && k<kmax
         end
     end
     %call BLS
-    [almax, ] = uo_BLSNW32(L,gL,wo,d,almax,c1,c2,kmaxBLS,epsal);
+    [almax,iw ] = uo_BLSNW32(L,gL,wo,d,almax,c1,c2,kmaxBLS,epsal);
     %update the solution
     wo = wo + almax.*d;
     k = k+1;
-    disp(k);
+    %disp(k);
+    %fprintf('%3d %10.6f  %10.6f\n',k, almax, L(wo));
     % update in order to calculate almax for the next iteration.
     wok  = [wok wo];
     dk  = [dk d];
     alk = [alk almax];
+    fo=L(wo);
     
 end
 niter = k;
