@@ -1,4 +1,4 @@
-function[wo,niter] = BFGS (epsG,kmax,ialmax,L,gL,wo,c1,c2,kmaxBLS,epsal)
+function[wo,niter,fo] = BFGS (epsG,kmax,ialmax,L,gL,wo,c1,c2,kmaxBLS,epsal)
 %initialization of the iteration's number
 k=1;
 % Vector of solution points.
@@ -36,6 +36,7 @@ while(norm(gL(wo)))>epsG && k<kmax
     wok  = [wok wo];
     dk  = [dk d];
     alk = [alk almax];
+    fo=L(wo);
     %Hk=[Hk;H];
 
 end
