@@ -51,17 +51,4 @@ while e <= sg_emax && s< sg_ebest
 end
     niter=count;
 end
-    end
-    e=e+1;
-    te_L = Le(wo);
-    %update loss function
-    if te_L < te_Lbest
-        te_Lbest = te_L;
-        wstar = wo;
-        s = 0;
-    else
-        s=s+1;
-    end
-    
-end
-end
+   
