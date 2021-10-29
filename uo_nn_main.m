@@ -3,9 +3,9 @@ clear;
 % Parameters for dataset generation
 %
 num_target =1;
-tr_freq    = .5;
-tr_p       = 250;
-te_q       = 250;
+tr_freq    = 0.0;
+tr_p       = 20000;
+te_q       = tr_p/10;
 tr_seed    = 123456;
 te_seed    = 789101;
 %
@@ -14,7 +14,7 @@ te_seed    = 789101;
 % isd=search direction (1=GM; 2=CGM; 3=BFGS);
 % icg=CGM variant(1=FR; 2=PR+);
 % irc= Restart for the CGM (0= no restart; 1=𝑹𝑹𝑹𝑹𝑹𝑹 ; 2=( ));nu=𝝂𝝂.
-la = .1;                                                     % L2 regularization.
+la = 0.01;                                                     % L2 regularization.
 epsG = 10^-6; kmax = 10000;                                   % Stopping criterium.
 ils=3; ialmax = 1;
 kmaxBLS=30; epsal=10^-3;c1=0.01; c2=0.45;  % Linesearch.
@@ -46,22 +46,24 @@ y = @(Xds,w) sig (w'*sig(Xds));
 L  = @(w) (norm(y(Xtr,w)-ytr)^2)/size (ytr,2) + (la*norm(w)^2)/2;                      % Loss function.
 gL = @(w) (2*sig(Xtr)*((y(Xtr,w)-ytr).*y(Xtr,w).*(1-y(Xtr,w)))')/size(ytr,2)+la*w;    % Gradient.
 Le =  @(w) (norm(y(Xte,w)-yte)^2)/size (yte,2) + (la*norm(w)^2)/2; 
+acc = @(Xds,yds,wo) 100*sum(yds==round(y(Xds,wo)))/size(Xds,2);
+
 %initialization of weights
 wo=ones(1,35)'*0;
 %Gradient method
 if isd == 1
    [wo,niter] = GM(epsG,kmax,ialmax,L,gL,wo,c1,c2,kmaxBLS,epsal);
    disp("niter = "+niter);
-   uo_nn_Xyplot(Xtr,ytr,wo);
+   disp("accuracy"+ acc(Xte,yte,wo));
 %BFGS-quasi Newton Method
 elseif isd == 3
        [wo,niter] =  BFGS (epsG,kmax,ialmax,L,gL,wo,c1,c2,kmaxBLS,epsal);
        disp("niter = "+niter);
-       uo_nn_Xyplot(Xtr,ytr,wo);
-       
+       disp("accuracy"+ acc(Xte,yte,wo));
+
 elseif isd == 7
     [wo] =  SGM (wo,la,L,Le,gL,Xtr,ytr,Xte,yte,sg_al0,sg_be,sg_ga,sg_emax,sg_ebest);
-       uo_nn_Xyplot(Xtr,ytr,wo);
+     disp("accuracy"+ acc(Xte,yte,wo));
 end
 
  
