@@ -71,12 +71,11 @@ elseif isd == 3
 %        uo_nn_Xyplot(Xtr,ytr,wo);
        
 elseif isd == 7
-    [wo] =  SGM (wo,la,L,Le,gL,Xtr,ytr,Xte,yte,sg_al0,sg_be,sg_ga,sg_emax,sg_ebest);
+    [wo,niter] =  SGM (wo,la,L,Le,gL,Xtr,ytr,Xte,yte,sg_al0,sg_be,sg_ga,sg_emax,sg_ebest);
     fo = L(wo);
     tr_acc = acc(Xtr,ytr,wo);
     te_acc = acc(Xte,yte,wo);
     
-    niter = 2021;
 %        disp("training");
 %        uo_nn_Xyplot(Xtr,ytr,wo);
 %        disp("Testing");
