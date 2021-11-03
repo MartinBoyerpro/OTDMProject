@@ -4,8 +4,8 @@ clear;
 %
 num_target =1;
 tr_freq    = 0.0;
-tr_p       = 20000;
-te_q       = tr_p/10;
+tr_p       = 250;
+te_q       = tr_p;
 tr_seed    = 123456;
 te_seed    = 789101;
 %
