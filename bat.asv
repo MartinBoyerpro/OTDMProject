@@ -3,7 +3,7 @@
 % Parameters.
 %
 tr_seed = 123456; te_seed = 789101;
-tr_p = 20000; te_q = tr_p/10; tr_freq = 0.0;                        % Datasets generation
+tr_p = 250; te_q = 250; tr_freq = 0.5;                        % Datasets generation
 epsG = 10^-6; kmax = 1000;                                    % Stopping condition.
 ils=3; ialmax = 1; kmaxBLS=10; epsal=10^-3; c1=0.01; c2=0.45; % Linesearch.
 icg = 2; irc = 2 ; nu = 1.0;                                  % Search direction.
@@ -38,6 +38,7 @@ function [Xtr,ytr,wo,fo,tr_acc,Xte,yte,te_acc,niter,tex]=uo_nn_solve(num_target,
 tsolve1=clock;
 %create the training data set
 [Xtr,ytr] = uo_nn_dataset(tr_seed , tr_p , num_target , tr_freq);
+
 %create the evaluater data set
 [Xte,yte] =uo_nn_dataset(te_seed,te_q,num_target,tr_freq);
 %Loss function and it gradient
@@ -70,11 +71,12 @@ elseif isd == 3
 %        uo_nn_Xyplot(Xtr,ytr,wo);
        
 elseif isd == 7
-    [wo,niter] =  SGM (wo,la,L,Le,gL,Xtr,ytr,Xte,yte,sg_al0,sg_be,sg_ga,sg_emax,sg_ebest);
+    [wo,niter,fo] =  SGM (wo,la,L,Le,gL,Xtr,ytr,Xte,yte,sg_al0,sg_be,sg_ga,sg_emax,sg_ebest);
     fo = L(wo);
     tr_acc = acc(Xtr,ytr,wo);
     te_acc = acc(Xte,yte,wo);
     
+    niter = ;
 %        disp("training");
 %        uo_nn_Xyplot(Xtr,ytr,wo);
 %        disp("Testing");
